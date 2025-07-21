@@ -1,0 +1,19 @@
+{
+    "rule0": {
+        "pre_compute": {
+            "oat": [0, 1]
+        },
+        "precond": {
+            "islight": [0]
+        },
+        "delete_objects": [0],
+        "delete_effects": {
+            "islight": [0],
+            "ismoveable": [0],
+            "oat": [0, 1]
+        },
+        "add_effects": {
+            "posempty": [1]
+        }
+    }
+}
