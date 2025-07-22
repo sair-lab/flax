@@ -43,7 +43,7 @@ if __name__ == "__main__":
     tmp_pddl_path = f"{assets_root_path}/{WAREHOUSE_SIZE}x{WAREHOUSE_SIZE}_namo_0.pddl"
     init_pos_dict = pos_dict
     args = {
-        "planner_type": "ploi",
+        "planner_type": "flax",
         "test_planner_name": "fd-lama-first",
         # "test_planner_name": "fd-opt-lmcut",
         "domain_name": "Mazenamo",

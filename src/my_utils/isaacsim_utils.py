@@ -19,7 +19,7 @@ from pxr import Gf, Usd, UsdPhysics, UsdGeom
 import pddlgym
 from pddlgym.structs import LiteralConjunction
 from planning import PlanningTimeout, PlanningFailure, \
-    validate_strips_plan, IncrementalPlanner, ComplementaryPlanner, PureRelaxationPlanner, MixComplementaryPlanner
+    validate_strips_plan, IncrementalPlanner, ComplementaryPlanner, PureRelaxationPlanner, FlaxPlanner
 from my_utils.pddl_utils import *
 from my_utils import *
 
@@ -261,7 +261,7 @@ def get_solution(planner_type, test_planner_name, domain_name, seed, guider_name
             base_planner=planner, search_guider=guider, seed=seed, 
             complementary_rules=cmpl_rules)
     elif planner_type == "flax":
-        planner_to_test = MixComplementaryPlanner(
+        planner_to_test = FlaxPlanner(
             is_strips_domain=is_strips_domain,
             base_planner=planner, search_guider=guider, seed=seed, 
             complementary_rules=cmpl_rules, relaxation_rules=relx_rules)

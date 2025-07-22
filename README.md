@@ -6,7 +6,7 @@
     <a href = "https://sairlab.org/taimengf/">Taimeng Fu</a><sup>1</sup>,
     <a href = "https://sairlab.org/zitongz/">Zitong Zhan</a><sup>1</sup>,
     <a href = "https://sairlab.org/zhipengz/">Zhiepeng Zhao</a><sup>1</sup>,
-    <a href = "https://sairlab.org/team/chenw/">Chen Wang</a><sup>1</sup>
+    <a href = "https://sairlab.org/chenw/">Chen Wang</a><sup>1</sup>
 </strong></p>
 
 <p align="center"><strong>
@@ -15,17 +15,21 @@
 
 </strong></p>
 
+<p align="center"><strong> 
+    <a href = "https://arxiv.org/abs/">&#128196; [Arxiv]</a>
+</strong></p>
+
 
 <img src="figs/pipeline.png" width="100%"/>
 
 # Abstract
-Real-world task planning requires long-horizon reasoning over large sets of entities with complex relationships and attributes, leading to a combinatorial explosion for classical symbolic planners. To prune the search space, recent methods prioritize searching on a simplified task only containing a few "important" entities predicted by a neural network. However, such a simple neuro-symbolic (NeSy) integration risks omitting critical entities and wasting resources on unsolvable simplified tasks. To enable **F**ast and reliable planning, we introduce a NeSy re**lax**ation strategy (**Flax**), combining neural importance prediction with symbolic expansion. Specifically, we first learn a graph neural network to predict entity importance to create a simplified task and solve it with a symbolic planner. Then, we solve a rule-relaxed task to obtain a quick rough plan, and reintegrate all referenced entities into the simplified task to recover any overlooked but essential elements. Finally, we apply complementary rules to refine the updated task, keeping it both reliable and compact. Extensive experiments are conducted on both synthetic and real-world maze navigation benchmarks where a robot must traverse through a maze and interact with movable objects. The results show that Flax boosts the average success rate by 20.82% and cuts mean wall-clock planning time by 17.65% compared with the state-of-the-art NeSy baseline. We expect that Flax offers a practical path toward fast, scalable, long-horizon task planning in complex environments. [[PDF]()] [[Website]()]
+Real-world task planning requires long-horizon reasoning over large sets of entities with complex relationships and attributes, leading to a combinatorial explosion for classical symbolic planners. To prune the search space, recent methods prioritize searching on a simplified task only containing a few "important" entities predicted by a neural network. However, such a simple neuro-symbolic (NeSy) integration risks omitting critical entities and wasting resources on unsolvable simplified tasks. To enable **F**ast and reliable planning, we introduce a NeSy re**lax**ation strategy (**Flax**), combining neural importance prediction with symbolic expansion. Specifically, we first learn a graph neural network to predict entity importance to create a simplified task and solve it with a symbolic planner. Then, we solve a rule-relaxed task to obtain a quick rough plan, and reintegrate all referenced entities into the simplified task to recover any overlooked but essential elements. Finally, we apply complementary rules to refine the updated task, keeping it both reliable and compact. Extensive experiments are conducted on both synthetic and real-world maze navigation benchmarks where a robot must traverse through a maze and interact with movable objects. The results show that Flax boosts the average success rate by 20.82% and cuts mean wall-clock planning time by 17.65% compared with the state-of-the-art NeSy baseline. We expect that Flax offers a practical path toward fast, scalable, long-horizon task planning in complex environments.
 
 **Video:**
 
 
 <p align="middle">
-<a href="" target="_blank"><img src="figs/video_cover.jpg" width="600" border="3"/></a>
+<a href="https://youtu.be/_4DYcqwycnQ" target="_blank"><img src="figs/video_cover.jpg" width="600" border="3"/></a>
 </p>
 
 # Experiments
@@ -152,3 +156,11 @@ python src/solve_isaacsim_mazenamo_from_usd_forklift.py
 
 # Code base
 Parts of this repository are derived from https://github.com/tomsilver/ploi and https://github.com/tomsilver/pddlgym. Many thanks to the original authors for sharing their code.
+
+## Publications
+
+If you our code in your own work, please cite:
+
+```
+
+```

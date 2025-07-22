@@ -13,7 +13,7 @@ from my_utils.pddl_utils import *
 import pddlgym
 from pddlgym.structs import LiteralConjunction
 from planning import PlanningTimeout, PlanningFailure, \
-    validate_strips_plan, IncrementalPlanner, ComplementaryPlanner, PureRelaxationPlanner, MixComplementaryPlanner
+    validate_strips_plan, IncrementalPlanner, ComplementaryPlanner, PureRelaxationPlanner, FlaxPlanner
 
 
 def get_gnn_relaxed_grid(grid, ignored_objects):
@@ -93,7 +93,7 @@ def visualize_one_problem(problem_map_dir, problem_idx, args):
             base_planner=planner, search_guider=guider, seed=seed, 
             complementary_rules=args.cmpl_rules)
     elif args.planner_type == "flax":
-        planner_to_test = MixComplementaryPlanner(
+        planner_to_test = FlaxPlanner(
             is_strips_domain=is_strips_domain,
             base_planner=planner, search_guider=guider, seed=seed, 
             complementary_rules=args.cmpl_rules, relaxation_rules=args.relx_rules)

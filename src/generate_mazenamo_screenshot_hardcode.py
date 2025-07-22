@@ -12,7 +12,7 @@ import pickle as pkl
 import imageio
 from my_utils.pddl_utils import *
 from planning import PlanningTimeout, PlanningFailure, \
-    validate_strips_plan, IncrementalPlanner, ComplementaryPlanner, MixComplementaryPlanner
+    validate_strips_plan, IncrementalPlanner, ComplementaryPlanner, FlaxPlanner
 import pddlgym
 from pddlgym.structs import LiteralConjunction
 import matplotlib.colors as mcolors
@@ -192,7 +192,7 @@ if __name__ == "__main__":
         guider.train(domain_name)
 
         if planner_type == "flax":
-            planner_to_test = MixComplementaryPlanner(
+            planner_to_test = FlaxPlanner(
                 is_strips_domain=is_strips_domain,
                 base_planner=planner, search_guider=guider, seed=seed, 
                 complementary_rules=cmpl_rules, relaxation_rules=relx_rules)

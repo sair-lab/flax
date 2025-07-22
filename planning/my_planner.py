@@ -418,7 +418,7 @@ class PureRelaxationPlanner(Planner):
 
 
 
-class MixComplementaryPlanner(Planner):
+class FlaxPlanner(Planner):
     """Sample objects by incrementally lowering a score threshold.
     """
     def __init__(self, is_strips_domain, base_planner, search_guider, seed,

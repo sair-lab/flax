@@ -2,14 +2,14 @@ import os
 import time
 os.environ["OMNI_KIT_ACCEPT_EULA"] = "YES"
 
-# from isaacsim import SimulationApp
+from isaacsim import SimulationApp
 
-# # Create the SimulationApp instance
-# simulation_app = SimulationApp({"headless": False})
+# Create the SimulationApp instance
+simulation_app = SimulationApp({"headless": False})
 
-from isaaclab.app import AppLauncher
-app_launcher = AppLauncher({"headless": False})
-simulation_app = app_launcher.app
+# from isaaclab.app import AppLauncher
+# app_launcher = AppLauncher({"headless": False})
+# simulation_app = app_launcher.app
 
 from isaacsim.core.utils.stage import create_new_stage, get_current_stage
 from isaacsim.core.api import World

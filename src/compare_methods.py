@@ -13,7 +13,7 @@ from my_utils.pddl_utils import *
 import pddlgym
 from pddlgym.structs import LiteralConjunction
 from planning import PlanningTimeout, PlanningFailure, \
-    validate_strips_plan, IncrementalPlanner, MixComplementaryPlanner
+    validate_strips_plan, IncrementalPlanner, FlaxPlanner
 
 
 def compare_one_problem(problem_map_dir, problem_idx, args):
@@ -60,7 +60,7 @@ def compare_one_problem(problem_map_dir, problem_idx, args):
     ploi_planner = IncrementalPlanner(
         is_strips_domain=is_strips_domain,
         base_planner=planner, search_guider=guider, seed=seed)
-    flax_planner = MixComplementaryPlanner(
+    flax_planner = FlaxPlanner(
         is_strips_domain=is_strips_domain,
         base_planner=planner, search_guider=guider, seed=seed, 
         complementary_rules=args.cmpl_rules, relaxation_rules=args.relx_rules)

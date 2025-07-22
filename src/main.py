@@ -4,7 +4,7 @@ import argparse
 import pddlgym
 from pddlgym.structs import LiteralConjunction
 from planning import PlanningTimeout, PlanningFailure, FD, \
-    validate_strips_plan, verify_validate_installed, IncrementalPlanner, ComplementaryPlanner, PureRelaxationPlanner, MixComplementaryPlanner
+    validate_strips_plan, verify_validate_installed, IncrementalPlanner, ComplementaryPlanner, PureRelaxationPlanner, FlaxPlanner
 from guidance import NoSearchGuidance, GNNSearchGuidance
 from my_utils.pddl_utils import _create_planner
 
@@ -140,7 +140,7 @@ def _run(domain_name, train_planner_name, test_planner_name,
                 base_planner=planner, search_guider=guider, seed=seed, 
                 relaxation_rules=relx_rules)
         elif planner_type == "flax":
-            planner_to_test = MixComplementaryPlanner(
+            planner_to_test = FlaxPlanner(
                 is_strips_domain=is_strips_domain,
                 base_planner=planner, search_guider=guider, seed=seed, 
                 complementary_rules=cmpl_rules, relaxation_rules=relx_rules)
