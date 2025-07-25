@@ -16,7 +16,7 @@
 </strong></p>
 
 <p align="center"><strong> 
-    <a href = "https://arxiv.org/abs/">&#128196; [Arxiv]</a>
+    <a href = "https://arxiv.org/abs/2507.15975">&#128196; [Arxiv]</a>
 </strong></p>
 
 
@@ -159,8 +159,12 @@ Parts of this repository are derived from https://github.com/tomsilver/ploi and 
 
 ## Publications
 
-If you our code in your own work, please cite:
-
+If you used our code in your research, or you find our work useful, please cite us as:
 ```
-
+@article{du2025fast,
+  title={Fast Task Planning with Neuro-Symbolic Relaxation},
+  author={Du, Qiwei and Li, Bowen and Du, Yi and Su, Shaoshu and Fu, Taimeng and Zhan, Zitong and Zhao, Zhipeng and Wang, Chen},
+  journal={arXiv preprint arXiv:2507.15975},
+  year={2025}
+}
 ```
