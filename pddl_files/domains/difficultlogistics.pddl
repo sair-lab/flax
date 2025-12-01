@@ -240,7 +240,7 @@
       (and (not (at ?truck ?loc-from))
            (at ?truck ?loc-to)))
 
-  ;; Planes unaffected by lock (you can lock them too with a similar pattern if you want)
+  ;; Planes unaffected by lock
   (:action FLY-AIRPLANE
     :parameters (?airplane ?loc-from ?loc-to)
     :precondition

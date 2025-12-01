@@ -133,7 +133,7 @@ def grid_to_pddl_sokomindplus(
         Each box has (isBox b<i>) and an initial (oAt b<i> p<idx>).
     - posEmpty:
         (posEmpty p<i>) holds for FREE cells that have NO BOX initially.
-        Robot presence does not affect posEmpty, consistent with your domain.
+        Robot presence does not affect posEmpty.
     - Adjacency:
         upTo pA pB  means "pA is above pB" (A.y = B.y - 1).
         downTo pA pB means "pA is below pB".
@@ -263,7 +263,7 @@ def grid_to_pddl_sokomindplus(
 # -----------------------------
 
 if __name__ == "__main__":
-    # Path to your sokomindplus domain
+    # Path to sokomindplus domain
     pddl_domain_file_path = "pddl_files/domains/sokomindplus.pddl"
     tmp_pddl_problem_path = "tmp_sokomindplus_problem.pddl"
     MAX_PROBLEM_NUM = 200
@@ -322,7 +322,6 @@ if __name__ == "__main__":
             problem_dir[mode][d] = path
             os.makedirs(path, exist_ok=True)
 
-    # Create planner wrapper (using your fd-lama-first helper)
     pddl_planner = _create_planner("fd-lama-first")
 
     while True:
@@ -358,7 +357,7 @@ if __name__ == "__main__":
             tmp_pddl_path=tmp_pddl_problem_path,
         )
 
-        # Call Fast Downward (via your helper)
+        # Call Fast Downward
         cmd_str = pddl_planner._get_cmd_str(
             pddl_domain_file_path,
             tmp_pddl_problem_path,
@@ -391,7 +390,7 @@ if __name__ == "__main__":
         elif timeout["hard"] <= time_cost < timeout["expert"]:
             mode = "expert"
 
-        # Extract plan (same regex style as your original script)
+        # Extract plan
         fd_plan = re.findall(r"(.+) \(\d+?\)", output.lower())
 
         if mode is None or not fd_plan or len(fd_plan) < min_plan_length:
