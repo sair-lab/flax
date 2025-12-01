@@ -200,8 +200,8 @@ def isaacsim_to_pddl(obj2pos, pos_dict, radius, robot_direction="dirIsDown", tmp
     init_state = "\n\t\t".join(init_state)
 
     pddl_str = \
-    """(define (problem namo_problem)
-    (:domain namo)
+    """(define (problem mazenamo_problem)
+    (:domain mazenamo)
     (:objects\n\t\t{}
     )
     (:init\n\t\t{}
@@ -217,7 +217,7 @@ def isaacsim_to_pddl(obj2pos, pos_dict, radius, robot_direction="dirIsDown", tmp
 
 def link_single_pddl_file_to_pddlgym(tmp_pddl_path):
     # Create a symbolic link to the PDDL file in the pddlgym pddl directory
-    namo_test_dir = f"{os.getcwd()}/pddlgym/pddl/mazenamo_test"
+    mazenamo_test_dir = f"{os.getcwd()}/pddlgym/pddl/mazenamo_test"
     if not os.path.exists(namo_test_dir):
         os.makedirs(namo_test_dir)
     else:
@@ -240,7 +240,7 @@ def get_solution(planner_type, test_planner_name, domain_name, seed, guider_name
     domain_name = pddlgym_env_names[domain_name]
     is_strips_domain = True
 
-    print(f"Solving namo problem from Isaac Sim with {planner_type} planner...", flush=True)
+    print(f"Solving mazenamo problem from Isaac Sim with {planner_type} planner...", flush=True)
 
     print("Starting seed {}".format(seed), flush=True)
 

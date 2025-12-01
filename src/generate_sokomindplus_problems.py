@@ -30,7 +30,7 @@ def generate_random_sokomindplus_map(
     max_goal_boxes=3,
 ):
     """
-    Generate a random Sokomind map of shape (size x size).
+    Generate a random Sokomind Plus map of shape (size x size).
 
     - Each cell is either a wall or free, i.e. we do NOT force an outer wall ring.
     - Place one robot on a free cell.
@@ -115,10 +115,10 @@ def grid_to_pddl_sokomindplus(
     goal_positions,
     problem_name="sokomindplus_problem",
     domain_name="sokomindplus",
-    tmp_pddl_path="sokomindplus_problems/tmp_sokomindplus_problem.pddl",
+    tmp_pddl_path="tmp_sokomindplus_problem.pddl",
 ):
     """
-    Convert a Sokomind grid and layout into a PDDL problem instance
+    Convert a Sokomind Plus grid and layout into a PDDL problem instance
     for the given sokomindplus domain.
 
     Encoding assumptions:

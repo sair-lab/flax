@@ -27,16 +27,14 @@ _build/
 venv
 
 # Customize
-# namo_problems/
 Minigrid/
 FD/
 model/
-namo_grid.npy
+mazenamo_grid.npy
 VAL/
 pddlgym/pddl
 nohup*
 sas_plan
 vis/
 assets/
-logistics_problems*/
 logs/

@@ -56,12 +56,12 @@ def visualize_one_problem(problem_map_dir, problem_idx, args):
         agent_start_dir=DIRECTIONS.index(robot_direction),
     )
 
-    namo_env = vec_env.env.env
+    mazenamo_env = vec_env.env.env
     np.save("namo_grid.npy", grid)
-    namo_env.gen_grid(args.problem_size, args.problem_size)
-    namo_env.reset()
+    mazenamo_env.gen_grid(args.problem_size, args.problem_size)
+    mazenamo_env.reset()
     imageio.imwrite(f"{args.vis_log_dir}/namo_{args.problem_size}x{args.problem_size}"
-                    f"_{args.problem_mode}_{problem_idx}_original_problem.jpg", namo_env.get_frame(highlight=False))
+                    f"_{args.problem_mode}_{problem_idx}_original_problem.jpg", mazenamo_env.get_frame(highlight=False))
 
     assert args.planner_type in ["pure", "ploi", "cmpl", "relx", "flax"], "Unknown planner type!"
 
@@ -71,7 +71,7 @@ def visualize_one_problem(problem_map_dir, problem_idx, args):
     domain_name = pddlgym_env_names[args.domain_name]
     is_strips_domain = True
 
-    print(f"Solving problem namo_{args.problem_size}x{args.problem_size}"
+    print(f"Solving problem mazenamo_{args.problem_size}x{args.problem_size}"
           f"_{args.problem_mode}_{problem_idx} with {args.planner_type} planner...", flush=True)
     seed = args.seed
     print("Starting seed {}".format(seed), flush=True)
@@ -129,15 +129,15 @@ def visualize_one_problem(problem_map_dir, problem_idx, args):
         len(plan), time.time()-start), flush=True)
 
     np.save("namo_grid.npy", grid)
-    namo_env.gen_grid(args.problem_size, args.problem_size)
-    namo_env.reset()
+    mazenamo_env.gen_grid(args.problem_size, args.problem_size)
+    mazenamo_env.reset()
 
     frames = [namo_env.get_frame(highlight=False)]
     for move in plan:
         action_name = move.__str__().split('(')[0]
         action = PDDL_ACTIONNAME_TO_INT[action_name]
-        obs, rewards, dones, _, info = namo_env.step(action)
-        # namo_env.render()
+        obs, rewards, dones, _, info = mazenamo_env.step(action)
+        # mazenamo_env.render()
         frames.append(namo_env.get_frame(highlight=False))
         
     imageio.mimsave(f"{args.vis_log_dir}/namo_{args.problem_size}x{args.problem_size}_{args.problem_mode}"

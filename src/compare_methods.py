@@ -35,10 +35,10 @@ def compare_one_problem(problem_map_dir, problem_idx, args):
         agent_start_dir=DIRECTIONS.index(robot_direction),
     )
 
-    namo_env = vec_env.env.env
+    mazenamo_env = vec_env.env.env
     np.save("namo_grid.npy", grid)
-    namo_env.gen_grid(args.problem_size, args.problem_size)
-    namo_env.reset()
+    mazenamo_env.gen_grid(args.problem_size, args.problem_size)
+    mazenamo_env.reset()
 
     planner = create_planner(args.test_planner_name)
     pddlgym_env_names = {"MazeNamo": "Mazenamo"}
@@ -46,7 +46,7 @@ def compare_one_problem(problem_map_dir, problem_idx, args):
     domain_name = pddlgym_env_names[args.domain_name]
     is_strips_domain = True
 
-    print(f"Solving problem namo_{args.problem_size}x{args.problem_size}"
+    print(f"Solving problem mazenamo_{args.problem_size}x{args.problem_size}"
           f"_{args.problem_mode}_{problem_idx}...", flush=True)
     seed = args.seed
     print("Starting seed {}".format(seed), flush=True)

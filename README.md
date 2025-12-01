@@ -120,14 +120,14 @@ flax/
 └── ...
 ```
 
-## Visualize a .usd file (optional)
+## (Optional) Visualize a .usd file
 First run:
 ```
 python src/run_isaacsim_gui.py
 ```
 Then, choose a .usd file in the GUI.
 
-## Generate your customized warehouse shape in Isaac Sim (optional)
+## (Optional) Generate your customized warehouse shape in Isaac Sim
 For simplicity, we only used a 2x2 square warehouse as the base scene in our experiments (`assets/2x2_warehouse_shapes.npy`).
 However, you can generate unique warehouse shapes using `generate_random_warehouse()` in `src/generate_isaacsim_warehouse_shape.py`, change the path of `warehouse_shapes` and run:
 ```
@@ -156,9 +156,39 @@ python src/solve_isaacsim_mazenamo_from_usd_forklift.py
 
 
 # Additional Domains
-We also included two more challenging domains to generalizability of our Flax.
-Difficult Logistics: Challenging version of classic Logistics.
-Sokomind Plus: Challenging version of classic Sokoban.
+We also included two more challenging domains to demonstrate the generalizability of our Flax.
+
+## Difficult Logistics
+It builds on the classic Logistics benchmark, where trucks and airplanes transport packages across a network of cities. Unlike the original domain, our variant requires **reasoning over an explicit connectivity graph of directed road and air links** rather than relying on simplified city-level abstractions. It further increases difficulty by introducing **unit-capacity vehicles, stackable packages, and locked road hubs that can only be unlocked via key packages at specific switch panels.** These additions create tight resource constraints and long-range causal dependencies, making the planning task substantially more complex than standard Logistics.
+
+### Run experiments with the provided datasets:
+```
+# run experiments with one group of settings
+bash scripts/run_difficultlogistics.sh
+```
+
+### (Optional) Generate your own datasets:
+```
+python src/generate_difficultlogistics_problems.py
+```
+
+## Sokomind Plus 
+It is a challenging variant of the classic Sokoban puzzle, where an agent pushes
+boxes on a grid to designated goal cells without pulling or passing through obstacles. Unlike standard
+Sokoban, where all boxes are typically interchangeable, SokoMind Plus **assigns specific boxes to individual goal locations while treating the remaining boxes purely as movable obstacles.** This introduces tighter goal constraints and additional clutter, making long-horizon planning substantially harder
+than in the original Sokoban setting.
+
+### Run experiments with the provided datasets:
+```
+# run experiments with one group of settings
+bash scripts/run_sokomindplus.sh
+```
+
+### (Optional) Generate your own datasets:
+```
+python src/generate_sokomindplus_problems.py
+```
+
 
 # Code base
 Parts of this repository are derived from https://github.com/tomsilver/ploi and https://github.com/tomsilver/pddlgym. Many thanks to the original authors for sharing their code.

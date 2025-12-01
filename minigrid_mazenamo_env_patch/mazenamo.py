@@ -24,7 +24,7 @@ class MazeNamoEnv(MiniGridEnv):
     """
     ## Description
 
-    This environment is an env for NAMO, and the goal of the agent is to reach the
+    This environment is an env for MazeNAMO, and the goal of the agent is to reach the
     green goal square, which provides a sparse reward. A small penalty is
     subtracted for the number of steps to reach the goal. This environment is
     useful, with small rooms, to validate that your RL algorithm works

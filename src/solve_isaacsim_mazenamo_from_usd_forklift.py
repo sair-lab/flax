@@ -56,7 +56,7 @@ if __name__ == "__main__":
     }
 
     ########################################################
-    # If namo scene is generated from grid map, 
+    # If mazenamo scene is generated from grid map, 
     # check and change this according to the output info
     robot_direction="dirIsDown"
     ########################################################
