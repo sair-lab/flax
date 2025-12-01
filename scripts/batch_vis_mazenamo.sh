@@ -49,7 +49,7 @@ run_experiment() {
     # Required arguments are: --domain_name, --problem_size, --problem_mode, --problem_idx,
     # --test_planner_name, --guider_name, --seed, --planner_type, --test_timeout, and --vis_log_dir.
     # For non-"pure" planners, we add --train_planner_name, --cmpl_rules and --relx_rules.
-    cmd="python -u src/minigrid_visualization.py --domain_name ${DOMAIN_NAME} \
+    cmd="python -u src/minigrid_mazenamo_visualization.py --domain_name ${DOMAIN_NAME} \
         --problem_size ${problem_size} --problem_mode ${problem_mode} --problem_idx ${problem_idx} \
         --test_planner_name ${test_planner_name} --guider_name ${guider_name} --seed ${seed} \
         --planner_type ${planner_type} --test_timeout ${test_timeout} --vis_log_dir ${vis_log_dir}"

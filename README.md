@@ -23,7 +23,7 @@
 <img src="figs/pipeline.png" width="100%"/>
 
 # Abstract
-Real-world task planning requires long-horizon reasoning over large sets of objects with complex relationships and attributes, leading to a combinatorial explosion for classical symbolic planners. To prune the search space, recent methods prioritize searching on a simplified task only containing a few "important" objects predicted by a neural network. However, such a simple neuro-symbolic (NeSy) integration risks omitting critical objects and wasting resources on unsolvable simplified tasks. To enable **F**ast and reliable planning, we introduce a NeSy re**lax**ation strategy (**Flax**), combining neural importance prediction with symbolic expansion. Specifically, we first learn a graph neural network to predict entity importance to create a simplified task and solve it with a symbolic planner. Then, we solve a rule-relaxed task to obtain a quick rough plan, and reintegrate all referenced objects into the simplified task to recover any overlooked but essential elements. Finally, we apply complementary rules to refine the updated task, keeping it both reliable and compact. Extensive experiments are conducted on both synthetic and real-world maze navigation benchmarks where a robot must traverse through a maze and interact with movable obstacles. The results show that Flax boosts the average success rate by 20.82% and cuts mean wall-clock planning time by 17.65% compared with the state-of-the-art NeSy baseline. We expect that Flax offers a practical path toward fast, scalable, long-horizon task planning in complex environments.
+Real-world task planning requires long-horizon reasoning over large sets of objects with complex relationships and attributes, leading to a combinatorial explosion for classical symbolic planners. To prune the search space, recent methods prioritize searching on a simplified task only containing a few "important" objects predicted by a neural network. However, such a simple neuro-symbolic (NeSy) integration risks omitting critical objects and wasting resources on unsolvable simplified tasks. To enable **F**ast and reliable planning, we introduce a NeSy re**lax**ation strategy (**Flax**), combining neural importance prediction with symbolic expansion. Specifically, we first learn a graph neural network to predict object importance to create a simplified task and solve it with a symbolic planner. Then, we solve a rule-relaxed task to obtain a quick rough plan, and reintegrate all referenced objects into the simplified task to recover any overlooked but essential elements. Finally, we apply complementary rules to refine the updated task, keeping it both reliable and compact. Extensive experiments are conducted on both synthetic and real-world maze navigation benchmarks where a robot must traverse through a maze and interact with movable obstacles. The results show that Flax boosts the average success rate by 20.82% and cuts mean wall-clock planning time by 17.65% compared with the state-of-the-art NeSy baseline. We expect that Flax offers a practical path toward fast, scalable, long-horizon task planning in complex environments.
 
 **Video:**
 
@@ -138,15 +138,15 @@ if you have customized requirements. You will get a .usd file of an empty wareho
 ## Generate a MazeNamo scene in Isaac Sim
 Generate from a grid map in `pddl_files/problems/mazenamo_problems/`:
 ```
-python src/generate_isaacsim_scene_from_grid_map.py
+python src/generate_isaacsim_mazenamo_from_gridmap.py
 ```
 Generate from a handcrafted scene:
 ```
-python src/generate_isaacsim_scene_example.py
+python src/generate_isaacsim_mazenamo_example.py
 ```
 
 ## Solve the MazeNamo problem in Isaac Sim using Forklift
-Remember to set the initial robot direction in `solve_isaacsim_mazenamo_from_usd_forklift.py` according to the output info of `generate_isaacsim_scene_from_grid_map.py`.
+Remember to set the initial robot direction in `solve_isaacsim_mazenamo_from_usd_forklift.py` according to the output info of `generate_isaacsim_mazenamo_from_gridmap.py`.
 ```
 python src/solve_isaacsim_mazenamo_from_usd_forklift.py
 ```
