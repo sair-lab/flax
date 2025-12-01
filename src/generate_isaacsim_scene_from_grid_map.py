@@ -37,8 +37,8 @@ if __name__ == "__main__":
     problem_mode = "hard"
     problem_idx = 19
 
-    problem_map_dir = f"namo_problems/map_{problem_size}x{problem_size}_{problem_mode}"
-    problem_map_file = f"{problem_map_dir}/namo_map_{problem_idx}.pkl"
+    problem_map_dir = f"pddl_files/problems/mazenamo_problems/map_{problem_size}x{problem_size}_{problem_mode}"
+    problem_map_file = f"{problem_map_dir}/mazenamo_map_{problem_idx}.pkl"
     with open(problem_map_file, "rb") as f:
         problem_dict = pkl.load(f)
 

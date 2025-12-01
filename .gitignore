@@ -38,4 +38,5 @@ nohup*
 sas_plan
 vis/
 assets/
-namo_problem.pddl
+logistics_problems*/
+logs/

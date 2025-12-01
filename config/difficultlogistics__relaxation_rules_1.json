@@ -1,0 +1,59 @@
+{
+    "rule0": {
+        "pre_compute": {},
+        "precond": {
+            "locked": [0]
+        },
+        "delete_objects": [],
+        "add_objects": [],
+        "delete_effects": {
+            "locked": [0]
+        },
+        "add_effects": {
+        }
+    },
+    "rule1": {
+        "pre_compute": {
+        },
+        "precond": {
+            "obj": [0]
+        },
+        "delete_objects": [0],
+        "add_objects": [],
+        "delete_effects": {
+            "obj": [0],
+            "on-ground": [0],
+            "clear": [0],
+            "key-package": [0]
+        },
+        "add_effects": {
+        }
+    },
+    "rule2": {
+        "pre_compute": {},
+        "precond": {
+            "obj": [0]
+        },
+        "delete_objects": [0],
+        "add_objects": [],
+        "delete_effects": {
+        },
+        "add_effects": {
+            "on-ground": [0],
+            "clear": [0]
+        }
+    },
+    "rule3": {
+        "pre_compute": {},
+        "precond": {
+            "location": [0]
+        },
+        "delete_objects": [],
+        "add_objects": [],
+        "delete_effects": {
+        },
+        "add_effects": {
+             "loc-empty": [0]
+        }
+    }
+}

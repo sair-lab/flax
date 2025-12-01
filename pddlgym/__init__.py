@@ -26,8 +26,9 @@ def register_pddl_env(name, is_test_env, other_args):
     )
 
 for env_name, kwargs in [
-        ('MazeNamo', {'operators_as_actions': True, 'dynamic_action_space': True})
-
+        ('MazeNamo', {'operators_as_actions': True, 'dynamic_action_space': True}),
+        ('DifficultLogistics', {'operators_as_actions': True, 'dynamic_action_space': True}),
+        ('SokomindPlus', {'operators_as_actions': True, 'dynamic_action_space': True}),
 ]:
     other_args = {
         "raise_error_on_invalid_action": False,

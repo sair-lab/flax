@@ -44,7 +44,7 @@ def generate_hardcode_map():
 
     return grid, robot_pos, robot_direction
 
-def grid_to_pddl(w, h, grid, robot_pos, robot_direction, tmp_pddl_path = "namo_problems/namo_problem.pddl", no_wall_in_pddl = False):
+def grid_to_pddl(w, h, grid, robot_pos, robot_direction, tmp_pddl_path = "tmp_mazenamo_problem.pddl", no_wall_in_pddl = False):
     objects = ["r - robot"]
     goal = []
     init_state = ["(rAt r p{})".format(robot_pos[1] * h + robot_pos[0]), "(handempty)", "({} r)".format(robot_direction)]
@@ -105,8 +105,8 @@ def grid_to_pddl(w, h, grid, robot_pos, robot_direction, tmp_pddl_path = "namo_p
     init_state = "\n\t\t".join(init_state)
 
     pddl_str = \
-    """(define (problem namo_problem)
-    (:domain namo)
+    """(define (problem mazenamo_problem)
+    (:domain mazenamo)
     (:objects\n\t\t{}
     )
     (:init\n\t\t{}
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     grid, robot_pos, robot_direction = generate_hardcode_map()
 
     # Save the grid to a .npy file
-    np.save("namo_grid.npy", grid)
+    np.save("mazenamo_grid.npy", grid)
 
     # print("direction", robot_direction, DIRECTIONS.index(robot_direction))
     vec_env: MazeNamoEnv = gym.make(
@@ -159,12 +159,12 @@ if __name__ == "__main__":
         size=None,
         agent_start_dir=DIRECTIONS.index(robot_direction),
     )
-    namo_env = vec_env.env.env
-    namo_env.gen_grid(problem_size, problem_size)
-    namo_env.reset()
-    imageio.imwrite(f"vis/namo_{problem_size}x{problem_size}_hardcode_original_problem.jpg", namo_env.get_frame(highlight=False))
+    mazenamo_env = vec_env.env.env
+    mazenamo_env.gen_grid(problem_size, problem_size)
+    mazenamo_env.reset()
+    imageio.imwrite(f"vis/mazenamo_{problem_size}x{problem_size}_hardcode_original_problem.jpg", mazenamo_env.get_frame(highlight=False))
 
-    gym_grid = namo_env.grid.grid
+    gym_grid = mazenamo_env.grid.grid
     # Convert the grid to PDDL and save the problem file in tmp_pddl_path
     pddl_str = grid_to_pddl(problem_size, problem_size, gym_grid, robot_pos, robot_direction)
 
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     timeout = 1
     vis_log_dir = "vis"
 
-    print(f"Solving problem namo_{problem_size}x{problem_size} with {test_planner_name} planner...", flush=True)
+    print(f"Solving problem mazenamo_{problem_size}x{problem_size} with {test_planner_name} planner...", flush=True)
     for seed in range(1):
         print("Starting seed {}".format(seed), flush=True)
 
@@ -201,7 +201,7 @@ if __name__ == "__main__":
         env = pddlgym.make("PDDLEnv{}-v0".format(domain_name+"Test"))
         _idx = None
         for i, prob in enumerate(env.problems):
-            if f"namo_problem_{problem_idx}.pddl" in prob.problem_fname:
+            if f"mazenamo_problem_{problem_idx}.pddl" in prob.problem_fname:
                 _idx = i
                 env.fix_problem_index(_idx)
                 break
@@ -229,21 +229,21 @@ if __name__ == "__main__":
         print("Get plan of length {} in {:.5f} seconds".format(
             len(plan), time.time()-start), flush=True)
         print(plan)
-        namo_env.reset()
+        mazenamo_env.reset()
 
-        frames = [namo_env.get_frame(highlight=False)]
+        frames = [mazenamo_env.get_frame(highlight=False)]
         for i, move in enumerate(plan):
             action_name = move.__str__().split('(')[0]
             action = PDDL_ACTIONNAME_TO_INT[action_name]
-            obs, rewards, dones, _, info = namo_env.step(action)
-            # namo_env.render()
-            frames.append(namo_env.get_frame(highlight=False))
-            print(f"{vis_log_dir}/namo_{problem_size}x{problem_size}_hardcode_original_problem_seed_{seed}_step_{i+1}.jpg")
-            imageio.imwrite(f"{vis_log_dir}/namo_{problem_size}x{problem_size}_hardcode_original_problem_seed_{seed}_step_{i+1}.jpg", namo_env.get_frame(highlight=False))
+            obs, rewards, dones, _, info = _mazenamo_env.step(action)
+            # _mazenamo_env.render()
+            frames.append(_mazenamo_env.get_frame(highlight=False))
+            print(f"{vis_log_dir}/mazenamo_{problem_size}x{problem_size}_hardcode_original_problem_seed_{seed}_step_{i+1}.jpg")
+            imageio.imwrite(f"{vis_log_dir}/mazenamo_{problem_size}x{problem_size}_hardcode_original_problem_seed_{seed}_step_{i+1}.jpg", mazenamo_env.get_frame(highlight=False))
 
         if "gnn_ignored_objects" in vis_info and vis_info["gnn_ignored_objects"] is not None:
             _grid = get_gnn_relaxed_grid(grid.copy(), vis_info["gnn_ignored_objects"])
-            np.save("namo_grid.npy", _grid)
+            np.save("mazenamo_grid.npy", _grid)
             _vec_env: MazeNamoEnv = gym.make(
                 "MiniGrid-MazeNamo-v0",
                 render_mode="rgb_array",
@@ -252,14 +252,14 @@ if __name__ == "__main__":
                 size=None,
                 agent_start_dir=DIRECTIONS.index(robot_direction),
             )
-            _namo_env = _vec_env.env.env
-            _namo_env.gen_grid(problem_size, problem_size)
-            _namo_env.reset()
-            imageio.imwrite(f"{vis_log_dir}/namo_{problem_size}x{problem_size}_{problem_idx}_{planner_type}_gnn-relaxed_problem_{seed}.jpg", _namo_env.get_frame(highlight=False))
-            
+            _mazenamo_env = _vec_env.env.env
+            _mazenamo_env.gen_grid(problem_size, problem_size)
+            _mazenamo_env.reset()
+            imageio.imwrite(f"{vis_log_dir}/mazenamo_{problem_size}x{problem_size}_{problem_idx}_{planner_type}_gnn-relaxed_problem_{seed}.jpg", _mazenamo_env.get_frame(highlight=False))
+
             for threshold, ignored_objects in vis_info["gnn_ignored_objects_threshold_dict"].items():
                 _grid = get_gnn_relaxed_grid(grid.copy(), ignored_objects)
-                np.save("namo_grid.npy", _grid)
+                np.save("mazenamo_grid.npy", _grid)
                 _vec_env: MazeNamoEnv = gym.make(
                     "MiniGrid-MazeNamo-v0",
                     render_mode="rgb_array",
@@ -268,14 +268,14 @@ if __name__ == "__main__":
                     size=None,
                     agent_start_dir=DIRECTIONS.index(robot_direction),
                 )
-                _namo_env = _vec_env.env.env
-                _namo_env.gen_grid(problem_size, problem_size)
-                _namo_env.reset()
-                imageio.imwrite(f"{vis_log_dir}/namo_{problem_size}x{problem_size}_{problem_idx}_{planner_type}_gnn-relaxed_problem_{seed}_{threshold:.5f}.jpg", _namo_env.get_frame(highlight=False))
+                _mazenamo_env = _vec_env.env.env
+                _mazenamo_env.gen_grid(problem_size, problem_size)
+                _mazenamo_env.reset()
+                imageio.imwrite(f"{vis_log_dir}/mazenamo_{problem_size}x{problem_size}_{problem_idx}_{planner_type}_gnn-relaxed_problem_{seed}_{threshold:.5f}.jpg", _mazenamo_env.get_frame(highlight=False))
 
         if "cmpl_ignored_objects" in vis_info and vis_info["cmpl_ignored_objects"] is not None:
             _grid = get_gnn_relaxed_grid(grid.copy(), vis_info["cmpl_ignored_objects"])
-            np.save("namo_grid.npy", _grid)
+            np.save("mazenamo_grid.npy", _grid)
             _vec_env: MazeNamoEnv = gym.make(
                 "MiniGrid-MazeNamo-v0",
                 # render_mode="human",
@@ -285,14 +285,14 @@ if __name__ == "__main__":
                 size=None,
                 agent_start_dir=DIRECTIONS.index(robot_direction),
             )
-            _namo_env = _vec_env.env.env
-            _namo_env.gen_grid(problem_size, problem_size)
-            _namo_env.reset()
-            imageio.imwrite(f"{vis_log_dir}/namo_{problem_size}x{problem_size}_{problem_idx}_{planner_type}_enhanced_problem_{seed}.jpg", _namo_env.get_frame(highlight=False))
+            _mazenamo_env = _vec_env.env.env
+            _mazenamo_env.gen_grid(problem_size, problem_size)
+            _mazenamo_env.reset()
+            imageio.imwrite(f"{vis_log_dir}/mazenamo_{problem_size}x{problem_size}_{problem_idx}_{planner_type}_enhanced_problem_{seed}.jpg", _mazenamo_env.get_frame(highlight=False))
 
         if "relx_ignored_objects" in vis_info and vis_info["relx_ignored_objects"] is not None:
             _grid = get_rule_relaxed_grid(grid.copy(), vis_info["relx_ignored_objects"])
-            np.save("namo_grid.npy", _grid)
+            np.save("mazenamo_grid.npy", _grid)
             _vec_env: MazeNamoEnv = gym.make(
                 "MiniGrid-MazeNamo-v0",
                 # render_mode="human",
@@ -302,20 +302,20 @@ if __name__ == "__main__":
                 size=None,
                 agent_start_dir=DIRECTIONS.index(robot_direction),
             )
-            _namo_env = _vec_env.env.env
-            _namo_env.gen_grid(problem_size, problem_size)
-            _namo_env.reset()
-            frames = [_namo_env.get_frame(highlight=False)]
+            _mazenamo_env = _vec_env.env.env
+            _mazenamo_env.gen_grid(problem_size, problem_size)
+            _mazenamo_env.reset()
+            frames = [_mazenamo_env.get_frame(highlight=False)]
             for move in vis_info["relaxed_plan"]:
                 action_name = move.__str__().split('(')[0]
                 action = PDDL_ACTIONNAME_TO_INT[action_name]
-                obs, rewards, dones, _, info = _namo_env.step(action)
-                # _namo_env.render()
-                frames.append(_namo_env.get_frame(highlight=False))
+                obs, rewards, dones, _, info = _mazenamo_env.step(action)
+                # _mazenamo_env.render()
+                frames.append(_mazenamo_env.get_frame(highlight=False))
 
             if seed == 0:
-                imageio.imwrite(f"{vis_log_dir}/namo_{problem_size}x{problem_size}_{problem_idx}_{planner_type}_rule-relaxed_problem.jpg", frames[0])
-            # imageio.mimsave(f"{args.vis_log_dir}/namo_{args.problem_size}x{args.problem_size}_{problem_mode}"
+                imageio.imwrite(f"{vis_log_dir}/mazenamo_{problem_size}x{problem_size}_{problem_idx}_{planner_type}_rule-relaxed_problem.jpg", frames[0])
+            # imageio.mimsave(f"{args.vis_log_dir}/mazenamo_{args.problem_size}x{args.problem_size}_{problem_mode}"
             #                 f"_{problem_idx}_{args.planner_type}_rule-relaxed_solution_{seed}.gif", frames, fps=5)
 
         if "object_to_score" in vis_info and vis_info["object_to_score"] is not None:
@@ -370,8 +370,8 @@ if __name__ == "__main__":
                 elif obj.var_type == "pos":
                     x, y = (int(obj.name[1:]))%problem_size, (int(obj.name[1:]))//problem_size
                     pos_scores[y, x] = score
-            plot_scores_grid(box_scores, f"{vis_log_dir}/namo_{problem_size}x{problem_size}_{problem_idx}_object_scores_{seed}.png")
-            plot_scores_grid(pos_scores, f"{vis_log_dir}/namo_{problem_size}x{problem_size}_{problem_idx}_pos_scores_{seed}.png")
+            plot_scores_grid(box_scores, f"{vis_log_dir}/mazenamo_{problem_size}x{problem_size}_{problem_idx}_object_scores_{seed}.png")
+            plot_scores_grid(pos_scores, f"{vis_log_dir}/mazenamo_{problem_size}x{problem_size}_{problem_idx}_pos_scores_{seed}.png")
 
 
 

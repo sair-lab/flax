@@ -47,12 +47,12 @@ class GNNSearchGuidance(BaseSearchGuidance):
         self._num_node_features = None
         self._num_edge_features = None
 
-    def train(self, train_env_name):
+    def train(self, train_env_name, timeout=120):
         model_outfile = self._save_model_prefix+"_{}.pt".format(train_env_name)
         print("Training search guidance {} in domain {}...".format(
             self.__class__.__name__, train_env_name))
         # Collect raw training data. Inputs are States, outputs are objects.
-        training_data = self._collect_training_data(train_env_name)
+        training_data = self._collect_training_data(train_env_name, timeout=timeout)
         # Convert training data to graphs
         graphs_input, graphs_target = self._create_graph_dataset(training_data)
         # Use 10% for validation
@@ -110,7 +110,7 @@ class GNNSearchGuidance(BaseSearchGuidance):
             self._last_processed_state = state
         return self._last_object_scores[obj]
 
-    def _collect_training_data(self, train_env_name):
+    def _collect_training_data(self, train_env_name, timeout=120):
         """Returns X, Y where X are States and Y are sets of objects
         """
         outfile = self._dataset_file_prefix + "_{}.pkl".format(train_env_name)
@@ -127,7 +127,7 @@ class GNNSearchGuidance(BaseSearchGuidance):
                 if type(state.goal).__name__ == "Literal":
                     state = state.with_goal(LiteralConjunction([state.goal]))                
                 try:
-                    plan = self._planner(env.domain, state, timeout=120)
+                    plan = self._planner(env.domain, state, timeout=timeout)
                 except (PlanningTimeout, PlanningFailure):
                     print("Warning: planning failed, skipping: {}".format(
                         env.problems[idx].problem_fname))

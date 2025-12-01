@@ -23,7 +23,7 @@
 <img src="figs/pipeline.png" width="100%"/>
 
 # Abstract
-Real-world task planning requires long-horizon reasoning over large sets of entities with complex relationships and attributes, leading to a combinatorial explosion for classical symbolic planners. To prune the search space, recent methods prioritize searching on a simplified task only containing a few "important" entities predicted by a neural network. However, such a simple neuro-symbolic (NeSy) integration risks omitting critical entities and wasting resources on unsolvable simplified tasks. To enable **F**ast and reliable planning, we introduce a NeSy re**lax**ation strategy (**Flax**), combining neural importance prediction with symbolic expansion. Specifically, we first learn a graph neural network to predict entity importance to create a simplified task and solve it with a symbolic planner. Then, we solve a rule-relaxed task to obtain a quick rough plan, and reintegrate all referenced entities into the simplified task to recover any overlooked but essential elements. Finally, we apply complementary rules to refine the updated task, keeping it both reliable and compact. Extensive experiments are conducted on both synthetic and real-world maze navigation benchmarks where a robot must traverse through a maze and interact with movable objects. The results show that Flax boosts the average success rate by 20.82% and cuts mean wall-clock planning time by 17.65% compared with the state-of-the-art NeSy baseline. We expect that Flax offers a practical path toward fast, scalable, long-horizon task planning in complex environments.
+Real-world task planning requires long-horizon reasoning over large sets of objects with complex relationships and attributes, leading to a combinatorial explosion for classical symbolic planners. To prune the search space, recent methods prioritize searching on a simplified task only containing a few "important" objects predicted by a neural network. However, such a simple neuro-symbolic (NeSy) integration risks omitting critical objects and wasting resources on unsolvable simplified tasks. To enable **F**ast and reliable planning, we introduce a NeSy re**lax**ation strategy (**Flax**), combining neural importance prediction with symbolic expansion. Specifically, we first learn a graph neural network to predict entity importance to create a simplified task and solve it with a symbolic planner. Then, we solve a rule-relaxed task to obtain a quick rough plan, and reintegrate all referenced objects into the simplified task to recover any overlooked but essential elements. Finally, we apply complementary rules to refine the updated task, keeping it both reliable and compact. Extensive experiments are conducted on both synthetic and real-world maze navigation benchmarks where a robot must traverse through a maze and interact with movable obstacles. The results show that Flax boosts the average success rate by 20.82% and cuts mean wall-clock planning time by 17.65% compared with the state-of-the-art NeSy baseline. We expect that Flax offers a practical path toward fast, scalable, long-horizon task planning in complex environments.
 
 **Video:**
 
@@ -42,7 +42,7 @@ We propose a task called **Maze Navigation Among Movable Obstacles (MazeNamo)**.
 
 <img src="figs/mazenamo_minigrid_example.gif" width="50%"/>
 
-# Environment setup
+# Environment Setup
 
 Create conda environment
 ```
@@ -57,42 +57,42 @@ bash scripts/create_mazenamo_env.sh
 ```
 
 # Dataset
-The dataset is in `namo_problems`.
+The dataset is in `pddl_files/problems/mazenamo_problems`.
 Link the training set to `pddlgym`:
 ```
 mkdir pddlgym/pddl
-ln -s $(pwd)/namo_domain.pddl $(pwd)/pddlgym/pddl/mazenamo.pddl
-ln -s $(pwd)/namo_problems/pddl_10x10_train $(pwd)/pddlgym/pddl/mazenamo
+ln -s $(pwd)/pddl_files/domains/mazenamo.pddl $(pwd)/pddlgym/pddl/mazenamo.pddl
+ln -s $(pwd)/pddl_files/problems/mazenamo_problems/pddl_10x10_train $(pwd)/pddlgym/pddl/mazenamo
 ```
 
-## MazeNamo problem generation (optional)
+## (Optional) MazeNamo Problem Generation
 You can also generate new datasets using:
 ```
 python src/generate_mazenamo_problems.py
 ```
 where problem size and problem difficulty can be changed.
 
-# Install the plan validation tool
+# Install Plan Validation Tool (VAL)
 ```
 bash scripts/install_VAL.sh
 ```
 
-# Train and test
+# Train and Test
 Trained models are reused in batch scripts.  
 All experiments use models trained on 200 10x10 problems. 
 (If training hasn't been run before, weights will appear in `model/`. If `model/` already exists, training will be skipped.)
 ```
 # run experiments with one group of settings
-bash scripts/run.sh
+bash scripts/run_mazenamo.sh
 
 # run experiments with multiple groups of settings
-bash scripts/batch_run.sh
+bash scripts/batch_run_mazenamo.sh
 ```
 
 # MiniGrid Visualization
 ```
 # generate .gif for a specific problem or all the problems of a certain group of settings
-bash scripts/batch_vis.sh
+bash scripts/batch_vis_mazenamo.sh
 ```
 
 # Isaac Sim Experiments
@@ -102,7 +102,7 @@ pip install isaacsim[all]==4.5.0 --extra-index-url https://pypi.nvidia.com
 pip install usd-core  # named pxr when importing, used to handle usd files
 ```
 
-## Download assets
+## Download Assets
 Download usd files here:
 ```
 https://drive.google.com/file/d/1Jg4G-aZOua9H5BjGLgwRbY28F0TyK66f/view?usp=sharing
@@ -136,7 +136,7 @@ python src/generate_isaacsim_warehouse_base_scene.py
 if you have customized requirements. You will get a .usd file of an empty warehouse (something like `assets/2x2_warehouse_base_0.usd`).
 
 ## Generate a MazeNamo scene in Isaac Sim
-Generate from a grid map in `namo_problems/`:
+Generate from a grid map in `pddl_files/problems/mazenamo_problems/`:
 ```
 python src/generate_isaacsim_scene_from_grid_map.py
 ```
@@ -153,6 +153,12 @@ python src/solve_isaacsim_mazenamo_from_usd_forklift.py
 (Note: Rendering on the RTX 4090 GPU currently supports only 10×10 and 12×12 maps. Scaling up to a 15×15 map requires a 3×3 warehouse configuration; however, rendering the full scene sometimes exceeds the available GPU memory.)
 
 <img src="figs/mazenamo_isaacsim_example.gif" width="95%"/>
+
+
+# Additional Domains
+We also included two more challenging domains to generalizability of our Flax.
+Difficult Logistics: Challenging version of classic Logistics.
+Sokomind Plus: Challenging version of classic Sokoban.
 
 # Code base
 Parts of this repository are derived from https://github.com/tomsilver/ploi and https://github.com/tomsilver/pddlgym. Many thanks to the original authors for sharing their code.

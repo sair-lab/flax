@@ -58,7 +58,7 @@ def place_randomly(grid, value):
         raise ValueError("No empty positions left to place objects.")
     return tuple(random.choice(empty_positions))
 
-def grid_to_pddl(w, h, grid, robot_pos, robot_direction, tmp_pddl_path = "namo_problems/namo_problem.pddl", no_wall_in_pddl = False):
+def grid_to_pddl(w, h, grid, robot_pos, robot_direction, tmp_pddl_path = "tmp_mazenamo_problem.pddl", no_wall_in_pddl = False):
     objects = ["r - robot"]
     goal = []
     init_state = ["(rAt r p{})".format(robot_pos[1] * h + robot_pos[0]), "(handempty)", "({} r)".format(robot_direction)]
@@ -119,8 +119,8 @@ def grid_to_pddl(w, h, grid, robot_pos, robot_direction, tmp_pddl_path = "namo_p
     init_state = "\n\t\t".join(init_state)
 
     pddl_str = \
-    """(define (problem namo_problem)
-    (:domain namo)
+    """(define (problem mazenamo_problem)
+    (:domain mazenamo)
     (:objects\n\t\t{}
     )
     (:init\n\t\t{}
@@ -136,8 +136,8 @@ def grid_to_pddl(w, h, grid, robot_pos, robot_direction, tmp_pddl_path = "namo_p
 
 
 if __name__ == "__main__":
-    pddl_domain_file_path = "namo_domain.pddl"
-    tmp_pddl_problem_path = "namo_problems/namo_problem.pddl"
+    pddl_domain_file_path = "pddl_files/domains/mazenamo.pddl"
+    tmp_pddl_problem_path = "tmp_mazenamo_problem.pddl"
     MAX_PROBLEM_NUM = 500
 
     problem_size = 15
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     for mode in ["easy", "medium", "hard", "expert"]:
         problem_dir[mode] = {}
         for dir in ["map", "pddl", "solution_sat"]:
-            problem_dir[mode][dir] = f"namo_problems/{dir}_{problem_size}x{problem_size}_{mode}"
+            problem_dir[mode][dir] = f"pddl_files/problems/mazenamo_problems/{dir}_{problem_size}x{problem_size}_{mode}"
             if not os.path.exists(problem_dir[mode][dir]):
                 os.makedirs(problem_dir[mode][dir])
     
@@ -187,7 +187,7 @@ if __name__ == "__main__":
         grid, robot_pos, robot_direction = generate_random_map(problem_size)
 
         # Save the grid to a .npy file
-        np.save("namo_grid.npy", grid)
+        np.save("mazenamo_grid.npy", grid)
 
         # print("direction", robot_direction, DIRECTIONS.index(robot_direction))
         vec_env: MazeNamoEnv = gym.make(
@@ -198,10 +198,10 @@ if __name__ == "__main__":
             size=None,
             agent_start_dir=DIRECTIONS.index(robot_direction),
         )
-        namo_env = vec_env.env.env
-        namo_env.gen_grid(problem_size, problem_size)
+        mazenamo_env = vec_env.env.env
+        mazenamo_env.gen_grid(problem_size, problem_size)
 
-        gym_grid = namo_env.grid.grid
+        gym_grid = mazenamo_env.grid.grid
 
         # Convert the grid to PDDL and save the problem file in tmp_pddl_path
         pddl_str = grid_to_pddl(problem_size, problem_size, gym_grid, robot_pos, robot_direction)
@@ -211,7 +211,7 @@ if __name__ == "__main__":
         output = subprocess.getoutput(cmd_str)
         pddl_planner._cleanup()
         os.remove(tmp_pddl_problem_path)
-        os.remove("namo_grid.npy")
+        os.remove("mazenamo_grid.npy")
 
         time_cost = time.time() - start_time
 
@@ -244,13 +244,13 @@ if __name__ == "__main__":
             "robot_direction": robot_direction,
         }
 
-        with open(f"{problem_dir[mode]['map']}/namo_map_{problem_idx[mode]}.pkl", "wb") as f:
+        with open(f"{problem_dir[mode]['map']}/mazenamo_map_{problem_idx[mode]}.pkl", "wb") as f:
             pkl.dump(problem_dict, f)
 
-        with open(f"{problem_dir[mode]['pddl']}/namo_problem_{problem_idx[mode]}.pddl", "w") as f:
+        with open(f"{problem_dir[mode]['pddl']}/mazenamo_problem_{problem_idx[mode]}.pddl", "w") as f:
             f.write(pddl_str)
-        
-        with open(f"{problem_dir[mode]['solution_sat']}/namo_solution_{problem_idx[mode]}.txt", "w") as f:
+
+        with open(f"{problem_dir[mode]['solution_sat']}/mazenamo_solution_{problem_idx[mode]}.txt", "w") as f:
             for move in fd_plan:
                 f.write(str(move) + '\n')
         print(f"Find a/an {mode} problem! Solved in {time_cost}s. Plan length {len(fd_plan)}.")

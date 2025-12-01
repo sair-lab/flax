@@ -3,7 +3,7 @@ import time
 import argparse
 import pddlgym
 from pddlgym.structs import LiteralConjunction
-from planning import PlanningTimeout, PlanningFailure, FD, \
+from planning import PlanningTimeout, PlanningFailure, \
     validate_strips_plan, verify_validate_installed, IncrementalPlanner, ComplementaryPlanner, PureRelaxationPlanner, FlaxPlanner
 from guidance import NoSearchGuidance, GNNSearchGuidance
 from my_utils.pddl_utils import _create_planner
@@ -92,7 +92,7 @@ def _create_guider(guider_name, planner_name, num_train_problems,
 
 def _run(domain_name, train_planner_name, test_planner_name,
          guider_name, num_seeds, num_train_problems, num_test_problems,
-         planner_type, timeout, num_epochs, cmpl_rules, relx_rules):
+         planner_type, train_timeout, test_timeout, num_epochs, cmpl_rules, relx_rules):
     assert verify_validate_installed(), "`validate` installation not found, please follow the README"
     print("Starting run:")
     print("\tDomain: {}".format(domain_name))
@@ -107,7 +107,7 @@ def _run(domain_name, train_planner_name, test_planner_name,
     assert planner_type in ["pure", "ploi", "cmpl", "relx", "flax"], "Unknown planner type!"
 
     planner = _create_planner(test_planner_name)
-    pddlgym_env_names = {"MazeNamo": "Mazenamo"}
+    pddlgym_env_names = {"MazeNamo": "Mazenamo", "DifficultLogistics": "Difficultlogistics", "SokomindPlus": "Sokomindplus"}
     assert domain_name in pddlgym_env_names
     domain_name = pddlgym_env_names[domain_name]
     is_strips_domain = True
@@ -121,7 +121,7 @@ def _run(domain_name, train_planner_name, test_planner_name,
                                 num_train_problems, is_strips_domain,
                                 num_epochs, seed)
         guider.seed(seed)
-        guider.train(domain_name)
+        guider.train(domain_name, timeout=train_timeout)
 
         if planner_type == "pure":
             planner_to_test = planner
@@ -146,7 +146,7 @@ def _run(domain_name, train_planner_name, test_planner_name,
                 complementary_rules=cmpl_rules, relaxation_rules=relx_rules)
 
         planning_time, success_rate, plan_length, failure_problem_list = _test_planner(planner_type, planner_to_test, domain_name+"Test",
-                      num_problems=num_test_problems, timeout=timeout)
+                      num_problems=num_test_problems, timeout=test_timeout)
         planning_time_list.append(planning_time)
         success_rate_list.append(success_rate)
         plan_length_list.append(plan_length)
@@ -172,14 +172,15 @@ if __name__ == "__main__":
     parser.add_argument("--num_train_problems", type=int, default=0)
     parser.add_argument("--num_test_problems", required=True, type=int)
     parser.add_argument("--planner_type", required=True, type=str)
-    parser.add_argument("--timeout", required=True, type=float)
+    parser.add_argument("--train_timeout", type=float, default=120)
+    parser.add_argument("--test_timeout", required=True, type=float)
     parser.add_argument("--num_epochs", type=int, default=301)
-    parser.add_argument("--cmpl_rules", type=str, default="config/complementary_rules.json")
-    parser.add_argument("--relx_rules", type=str, default="config/relaxation_rules.json")
+    parser.add_argument("--cmpl_rules", type=str, default="config/mazenamo_complementary_rules.json")
+    parser.add_argument("--relx_rules", type=str, default="config/mazenamo_relaxation_rules.json")
     args = parser.parse_args()
 
     _run(args.domain_name, args.train_planner_name,
          args.test_planner_name, args.guider_name, args.num_seeds,
          args.num_train_problems, args.num_test_problems,
-         args.planner_type, args.timeout, args.num_epochs,
+         args.planner_type, args.train_timeout, args.test_timeout, args.num_epochs,
          args.cmpl_rules, args.relx_rules)

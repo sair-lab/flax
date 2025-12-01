@@ -11,6 +11,102 @@ from pddlgym.spaces import LiteralSpace
 from pddlgym.parser import PDDLProblemParser
 from planning import Planner, PlanningFailure, PlanningTimeout, validate_strips_plan
 
+def apply_complementary_rules(state, cur_objects, complementary_rules):
+    new_cur_objects = cur_objects.copy()
+
+    # First apply rules with single-object conditions to recover important objects with special roles
+    for lit in state.literals:
+        p_name = lit.predicate.name
+        if p_name in complementary_rules:
+            p_cmpl_rule = complementary_rules[p_name]
+            for v_idx_list_cond, v_idx_list_cmpl in zip(p_cmpl_rule["cond"], p_cmpl_rule["cmpl"]):
+                if len(v_idx_list_cond) == 1 and cur_objects.isdisjoint(set([lit.variables[v_idx] for v_idx in v_idx_list_cond])):
+                    new_cur_objects.update([lit.variables[v_idx] for v_idx in v_idx_list_cmpl])
+
+    # Then apply rules with two-object conditions
+    for lit in state.literals:
+        p_name = lit.predicate.name
+        if p_name in complementary_rules:
+            p_cmpl_rule = complementary_rules[p_name]
+            for v_idx_list_cond, v_idx_list_cmpl in zip(p_cmpl_rule["cond"], p_cmpl_rule["cmpl"]):
+                if len(v_idx_list_cond) == 2 and not cur_objects.isdisjoint(set([lit.variables[v_idx] for v_idx in v_idx_list_cond])):
+                    new_cur_objects.update([lit.variables[v_idx] for v_idx in v_idx_list_cmpl])
+
+    new_cur_lits = set()
+    for lit in state.literals:
+        if all(var in new_cur_objects for var in lit.variables):
+            new_cur_lits.add(lit)
+    dummy_state = State(new_cur_lits, new_cur_objects, state.goal)
+
+    return new_cur_objects, dummy_state
+
+def apply_relaxation_rules(state, relaxation_rules, domain, force_include_goal_objects=True):
+    relaxed_objects = set(state.objects)
+    relaxed_literals = set(state.literals)
+
+    goal_objects = set()
+    if force_include_goal_objects:
+        for lit in state.goal.literals:
+            goal_objects |= set(lit.variables)
+
+    for rule_name in relaxation_rules:
+        rule = relaxation_rules[rule_name]
+        pre_compute_relation = {}
+        for lit in state.literals:
+            p_name = lit.predicate.name
+            if p_name in rule["pre_compute"]:
+                if p_name not in pre_compute_relation:
+                    pre_compute_relation[p_name] = {}
+                v0_idx = rule["pre_compute"][p_name][0]
+                v1_idx = rule["pre_compute"][p_name][1]
+                v0, v1 = lit.variables[v0_idx], lit.variables[v1_idx]
+                pre_compute_relation[p_name][v0] = v1
+
+        for lit in state.literals:
+            p_name = lit.predicate.name
+            if p_name in rule["precond"]:
+                v_idx_2_obj = {}
+                for v_idx in rule["precond"][p_name]:
+                    v_idx_2_obj[v_idx] = lit.variables[0]
+                for v_idx in rule["delete_objects"]:
+                    if v_idx_2_obj[v_idx] not in goal_objects:
+                        relaxed_objects.discard(v_idx_2_obj[v_idx])
+                for del_p_name in rule["delete_effects"]:
+                    del_p = domain.predicates[del_p_name]
+                    v_idx_list = rule["delete_effects"][del_p_name]
+                    if len(v_idx_list) == 1:
+                        v_idx = v_idx_list[0]
+                        if v_idx_2_obj[v_idx] not in goal_objects:
+                            relaxed_literals.discard(Literal(del_p, [v_idx_2_obj[v_idx]]))
+                    elif len(v_idx_list) == 2:
+                        for v_idx in v_idx_list:
+                            if v_idx not in v_idx_2_obj:
+                                v0 = v_idx_2_obj[0]
+                                try: 
+                                    v_idx_2_obj[v_idx] = pre_compute_relation[del_p_name][v0]
+                                except:
+                                    continue
+                        try:
+                            relaxed_literals.discard(Literal(del_p, [v_idx_2_obj[v_idx] for v_idx in v_idx_list]))
+                        except:
+                            continue
+                for add_p_name in rule["add_effects"]:
+                    add_p = domain.predicates[add_p_name]
+                    v_idx_list = rule["add_effects"][add_p_name]
+                    if len(v_idx_list) == 1:
+                        v_idx = v_idx_list[0]
+                        relaxed_literals.add(Literal(add_p, [v_idx_2_obj[v_idx]]))
+    
+    # Clean up relaxed_literals, if any literal contains object not in relaxed_objects, remove it
+    cleaned_relaxed_literals = set()
+    for lit in relaxed_literals:
+        if all(var in relaxed_objects for var in lit.variables):
+            cleaned_relaxed_literals.add(lit)
+    relaxed_literals = cleaned_relaxed_literals
+
+    dummy_state = State(relaxed_literals, relaxed_objects, state.goal)
+    return relaxed_objects, dummy_state
+
 
 class IncrementalPlanner(Planner):
     """Sample objects by incrementally lowering a score threshold.
@@ -205,19 +301,7 @@ class ComplementaryPlanner(Planner):
                 continue
             except PlanningTimeout:
                 # Try with enhanced objects.
-                new_cur_objects = cur_objects.copy()
-                for lit in state.literals:
-                    p_name = lit.predicate.name
-                    if p_name in self._complementary_rules:
-                        p_cmpl_rule = self._complementary_rules[p_name]
-                        for v_idx_list_cond, v_idx_list_cmpl in zip(p_cmpl_rule["cond"], p_cmpl_rule["cmpl"]):
-                            if not cur_objects.isdisjoint(set([lit.variables[v_idx] for v_idx in v_idx_list_cond])):
-                                new_cur_objects.update([lit.variables[v_idx] for v_idx in v_idx_list_cmpl])
-                new_cur_lits = set()
-                for lit in state.literals:
-                    if all(var in new_cur_objects for var in lit.variables):
-                        new_cur_lits.add(lit)
-                dummy_state = State(new_cur_lits, new_cur_objects, state.goal)
+                new_cur_objects, dummy_state = apply_complementary_rules(state, cur_objects, self._complementary_rules)
                 print("[Trying to plan with {} enhanced objects of {} total, "
                   "threshold is {}...]".format(len(new_cur_objects), len(state.objects), threshold), flush=True)
                 vis_info["cmpl_ignored_objects"] = state.objects - new_cur_objects
@@ -335,47 +419,7 @@ class PureRelaxationPlanner(Planner):
             except PlanningTimeout:
                 # Try with enhanced objects.
                 # Apply relaxation rules and solve the relaxed problem
-                relaxed_objects = set(state.objects)
-                relaxed_literals = set(state.literals)
-                for rule_name in self._relaxation_rules:
-                    rule = self._relaxation_rules[rule_name]
-                    pre_compute_relation = {}
-                    for lit in state.literals:
-                        p_name = lit.predicate.name
-                        if p_name in rule["pre_compute"]:
-                            if p_name not in pre_compute_relation:
-                                pre_compute_relation[p_name] = {}
-                            v0_idx = rule["pre_compute"][p_name][0]
-                            v1_idx = rule["pre_compute"][p_name][1]
-                            v0, v1 = lit.variables[v0_idx], lit.variables[v1_idx]
-                            pre_compute_relation[p_name][v0] = v1
-
-                    for lit in state.literals:
-                        p_name = lit.predicate.name
-                        if p_name in rule["precond"]:
-                            v_idx_2_obj = {}
-                            for v_idx in rule["delete_objects"]:
-                                v_idx_2_obj[v_idx] = lit.variables[0]
-                                relaxed_objects.discard(lit.variables[0])
-                            for del_p_name in rule["delete_effects"]:
-                                del_p = domain.predicates[del_p_name]
-                                v_idx_list = rule["delete_effects"][del_p_name]
-                                if len(v_idx_list) == 1:
-                                    v_idx = v_idx_list[0]
-                                    relaxed_literals.discard(Literal(del_p, [v_idx_2_obj[v_idx]]))
-                                elif len(v_idx_list) == 2:
-                                    for v_idx in v_idx_list:
-                                        if v_idx not in v_idx_2_obj:
-                                            v0 = v_idx_2_obj[1-v_idx]
-                                            v_idx_2_obj[v_idx] = pre_compute_relation[del_p_name][v0]
-                                    relaxed_literals.discard(Literal(del_p, [v_idx_2_obj[v_idx] for v_idx in v_idx_list]))
-                            for add_p_name in rule["add_effects"]:
-                                add_p = domain.predicates[add_p_name]
-                                v_idx_list = rule["add_effects"][add_p_name]
-                                if len(v_idx_list) == 1:
-                                    v_idx = v_idx_list[0]
-                                    relaxed_literals.add(Literal(add_p, [v_idx_2_obj[v_idx]]))
-                dummy_state = State(relaxed_literals, relaxed_objects, state.goal)
+                relaxed_objects, dummy_state = apply_relaxation_rules(state, self._relaxation_rules, domain, self._force_include_goal_objects)
                 print("[Trying to plan the rule-relaxed problem with {} objects of {} total...]".format(len(relaxed_objects), len(state.objects)), flush=True)
                 vis_info["relx_ignored_objects"] = state.objects - relaxed_objects
                 try:
@@ -389,14 +433,6 @@ class PureRelaxationPlanner(Planner):
                 cur_objects.update(objects_in_relaxed_plan)
 
                 new_cur_objects = cur_objects.copy()
-                # # print(f"Before applying complementary rules, cur_objects: {len(new_cur_objects)}")
-                # for lit in state.literals:
-                #     p_name = lit.predicate.name
-                #     if p_name in self._complementary_rules:
-                #         p_cmpl_rule = self._complementary_rules[p_name]
-                #         for v_idx_list_cond, v_idx_list_cmpl in zip(p_cmpl_rule["cond"], p_cmpl_rule["cmpl"]):
-                #             if not cur_objects.isdisjoint(set([lit.variables[v_idx] for v_idx in v_idx_list_cond])):
-                #                 new_cur_objects.update([lit.variables[v_idx] for v_idx in v_idx_list_cmpl])
                 new_cur_lits = set()
                 for lit in state.literals:
                     if all(var in new_cur_objects for var in lit.variables):
@@ -414,8 +450,6 @@ class PureRelaxationPlanner(Planner):
          
             return plan, vis_info
         raise PlanningFailure("Plan not found! Reached max_iterations.")
-
-
 
 
 class FlaxPlanner(Planner):
@@ -524,47 +558,7 @@ class FlaxPlanner(Planner):
             except PlanningTimeout:
                 # Try with enhanced objects.
                 # Apply relaxation rules and solve the relaxed problem
-                relaxed_objects = set(state.objects)
-                relaxed_literals = set(state.literals)
-                for rule_name in self._relaxation_rules:
-                    rule = self._relaxation_rules[rule_name]
-                    pre_compute_relation = {}
-                    for lit in state.literals:
-                        p_name = lit.predicate.name
-                        if p_name in rule["pre_compute"]:
-                            if p_name not in pre_compute_relation:
-                                pre_compute_relation[p_name] = {}
-                            v0_idx = rule["pre_compute"][p_name][0]
-                            v1_idx = rule["pre_compute"][p_name][1]
-                            v0, v1 = lit.variables[v0_idx], lit.variables[v1_idx]
-                            pre_compute_relation[p_name][v0] = v1
-
-                    for lit in state.literals:
-                        p_name = lit.predicate.name
-                        if p_name in rule["precond"]:
-                            v_idx_2_obj = {}
-                            for v_idx in rule["delete_objects"]:
-                                v_idx_2_obj[v_idx] = lit.variables[0]
-                                relaxed_objects.discard(lit.variables[0])
-                            for del_p_name in rule["delete_effects"]:
-                                del_p = domain.predicates[del_p_name]
-                                v_idx_list = rule["delete_effects"][del_p_name]
-                                if len(v_idx_list) == 1:
-                                    v_idx = v_idx_list[0]
-                                    relaxed_literals.discard(Literal(del_p, [v_idx_2_obj[v_idx]]))
-                                elif len(v_idx_list) == 2:
-                                    for v_idx in v_idx_list:
-                                        if v_idx not in v_idx_2_obj:
-                                            v0 = v_idx_2_obj[1-v_idx]
-                                            v_idx_2_obj[v_idx] = pre_compute_relation[del_p_name][v0]
-                                    relaxed_literals.discard(Literal(del_p, [v_idx_2_obj[v_idx] for v_idx in v_idx_list]))
-                            for add_p_name in rule["add_effects"]:
-                                add_p = domain.predicates[add_p_name]
-                                v_idx_list = rule["add_effects"][add_p_name]
-                                if len(v_idx_list) == 1:
-                                    v_idx = v_idx_list[0]
-                                    relaxed_literals.add(Literal(add_p, [v_idx_2_obj[v_idx]]))
-                dummy_state = State(relaxed_literals, relaxed_objects, state.goal)
+                relaxed_objects, dummy_state = apply_relaxation_rules(state, self._relaxation_rules, domain, self._force_include_goal_objects)
                 print("[Trying to plan the rule-relaxed problem with {} objects of {} total...]".format(len(relaxed_objects), len(state.objects)), flush=True)
                 vis_info["relx_ignored_objects"] = state.objects - relaxed_objects
                 try:
@@ -578,20 +572,7 @@ class FlaxPlanner(Planner):
                 cur_objects.update(objects_in_relaxed_plan)
 
                 # Apply complementary rules
-                new_cur_objects = cur_objects.copy()
-                # print(f"Before applying complementary rules, cur_objects: {len(new_cur_objects)}")
-                for lit in state.literals:
-                    p_name = lit.predicate.name
-                    if p_name in self._complementary_rules:
-                        p_cmpl_rule = self._complementary_rules[p_name]
-                        for v_idx_list_cond, v_idx_list_cmpl in zip(p_cmpl_rule["cond"], p_cmpl_rule["cmpl"]):
-                            if not cur_objects.isdisjoint(set([lit.variables[v_idx] for v_idx in v_idx_list_cond])):
-                                new_cur_objects.update([lit.variables[v_idx] for v_idx in v_idx_list_cmpl])
-                new_cur_lits = set()
-                for lit in state.literals:
-                    if all(var in new_cur_objects for var in lit.variables):
-                        new_cur_lits.add(lit)
-                dummy_state = State(new_cur_lits, new_cur_objects, state.goal)
+                new_cur_objects, dummy_state = apply_complementary_rules(state, cur_objects, self._complementary_rules)
                 print("[Trying to plan with {} enhanced objects of {} total, "
                   "threshold is {}...]".format(len(new_cur_objects), len(state.objects), threshold), flush=True)
                 vis_info["cmpl_ignored_objects"] = state.objects - new_cur_objects
