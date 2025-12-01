@@ -58,7 +58,7 @@ bash scripts/create_mazenamo_env.sh
 
 # Dataset
 The dataset is in `pddl_files/problems/mazenamo_problems`.
-Link the training set to `pddlgym`:
+Link the domain file and the training set to `pddlgym`:
 ```
 mkdir pddlgym/pddl
 ln -s $(pwd)/pddl_files/domains/mazenamo.pddl $(pwd)/pddlgym/pddl/mazenamo.pddl
@@ -156,10 +156,17 @@ python src/solve_isaacsim_mazenamo_from_usd_forklift.py
 
 
 # Additional Domains
-We also included two more challenging domains to demonstrate the generalizability of our Flax.
+We also introduced two challenging domains to demonstrate the generalizability of our Flax.
 
 ## Difficult Logistics
 It builds on the classic Logistics benchmark, where trucks and airplanes transport packages across a network of cities. Unlike the original domain, our variant requires **reasoning over an explicit connectivity graph of directed road and air links** rather than relying on simplified city-level abstractions. It further increases difficulty by introducing **unit-capacity vehicles, stackable packages, and locked road hubs that can only be unlocked via key packages at specific switch panels.** These additions create tight resource constraints and long-range causal dependencies, making the planning task substantially more complex than standard Logistics.
+
+## Link the domain file and the training set to `pddlgym`
+```
+mkdir pddlgym/pddl
+ln -s $(pwd)/pddl_files/domains/difficultlogistics.pddl $(pwd)/pddlgym/pddl/difficultlogistics.pddl
+ln -s $(pwd)/pddl_files/problems/difficultlogistics_problems/pddl_train $(pwd)/pddlgym/pddl/difficultlogistics
+```
 
 ### Run experiments with the provided datasets:
 ```
@@ -177,6 +184,13 @@ It is a challenging variant of the classic Sokoban puzzle, where an agent pushes
 boxes on a grid to designated goal cells without pulling or passing through obstacles. Unlike standard
 Sokoban, where all boxes are typically interchangeable, SokoMind Plus **assigns specific boxes to individual goal locations while treating the remaining boxes purely as movable obstacles.** This introduces tighter goal constraints and additional clutter, making long-horizon planning substantially harder
 than in the original Sokoban setting.
+
+## Link the domain file and the training set to `pddlgym`
+```
+mkdir pddlgym/pddl
+ln -s $(pwd)/pddl_files/domains/sokomindplus.pddl $(pwd)/pddlgym/pddl/sokomindplus.pddl
+ln -s $(pwd)/pddl_files/problems/sokomindplus_problems/pddl_train $(pwd)/pddlgym/pddl/sokomindplus
+```
 
 ### Run experiments with the provided datasets:
 ```
