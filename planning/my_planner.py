@@ -19,18 +19,20 @@ def apply_complementary_rules(state, cur_objects, complementary_rules):
         p_name = lit.predicate.name
         if p_name in complementary_rules:
             p_cmpl_rule = complementary_rules[p_name]
-            for v_idx_list_cond, v_idx_list_cmpl in zip(p_cmpl_rule["cond"], p_cmpl_rule["cmpl"]):
-                if len(v_idx_list_cond) == 1 and cur_objects.isdisjoint(set([lit.variables[v_idx] for v_idx in v_idx_list_cond])):
-                    new_cur_objects.update([lit.variables[v_idx] for v_idx in v_idx_list_cmpl])
+            if len(p_cmpl_rule["cond"]) == 1:
+                for v_idx_list_cond, v_idx_list_cmpl in zip(p_cmpl_rule["cond"], p_cmpl_rule["cmpl"]):
+                    if cur_objects.isdisjoint(set([lit.variables[v_idx] for v_idx in v_idx_list_cond])):
+                        new_cur_objects.update([lit.variables[v_idx] for v_idx in v_idx_list_cmpl])
 
     # Then apply rules with two-object conditions
     for lit in state.literals:
         p_name = lit.predicate.name
         if p_name in complementary_rules:
             p_cmpl_rule = complementary_rules[p_name]
-            for v_idx_list_cond, v_idx_list_cmpl in zip(p_cmpl_rule["cond"], p_cmpl_rule["cmpl"]):
-                if len(v_idx_list_cond) == 2 and not cur_objects.isdisjoint(set([lit.variables[v_idx] for v_idx in v_idx_list_cond])):
-                    new_cur_objects.update([lit.variables[v_idx] for v_idx in v_idx_list_cmpl])
+            if len(p_cmpl_rule["cond"]) == 2:
+                for v_idx_list_cond, v_idx_list_cmpl in zip(p_cmpl_rule["cond"], p_cmpl_rule["cmpl"]):
+                    if not cur_objects.isdisjoint(set([lit.variables[v_idx] for v_idx in v_idx_list_cond])):
+                        new_cur_objects.update([lit.variables[v_idx] for v_idx in v_idx_list_cmpl])
 
     new_cur_lits = set()
     for lit in state.literals:

@@ -295,13 +295,13 @@ if __name__ == "__main__":
     parser.add_argument("--seed", required=True, type=int, default=8)
     parser.add_argument("--planner_type", required=True, type=str)
     parser.add_argument("--timeout", required=True, type=float)
-    parser.add_argument("--cmpl_rules", type=str, default="config/complementary_rules.json")
-    parser.add_argument("--relx_rules", type=str, default="config/relaxation_rules.json")
+    parser.add_argument("--cmpl_rules", type=str, default="config/mazenamo_complementary_rules.json")
+    parser.add_argument("--relx_rules", type=str, default="config/mazenamo_relaxation_rules.json")
     parser.add_argument("--vis_log_dir", type=str, default="vis")
     parser.add_argument("--draw_scores", default=False, action="store_true",)
     args = parser.parse_args()
 
-    problem_map_dir = f"namo_problems/map_{args.problem_size}x{args.problem_size}_{args.problem_mode}"
+    problem_map_dir = f"pddl_files/problems/mazenamo_problems/map_{args.problem_size}x{args.problem_size}_{args.problem_mode}"
     if not os.path.exists(args.vis_log_dir):
         os.mkdir(args.vis_log_dir)
     if args.problem_idx == "all":
