@@ -132,14 +132,14 @@ def visualize_one_problem(problem_map_dir, problem_idx, args):
     mazenamo_env.gen_grid(args.problem_size, args.problem_size)
     mazenamo_env.reset()
 
-    frames = [namo_env.get_frame(highlight=False)]
+    frames = [mazenamo_env.get_frame(highlight=False)]
     for move in plan:
         action_name = move.__str__().split('(')[0]
         action = PDDL_ACTIONNAME_TO_INT[action_name]
         obs, rewards, dones, _, info = mazenamo_env.step(action)
         # mazenamo_env.render()
-        frames.append(namo_env.get_frame(highlight=False))
-        
+        frames.append(mazenamo_env.get_frame(highlight=False))
+
     imageio.mimsave(f"{args.vis_log_dir}/namo_{args.problem_size}x{args.problem_size}_{args.problem_mode}"
                     f"_{problem_idx}_{args.planner_type}_solution_{seed}.gif", frames, fps=5)
 
