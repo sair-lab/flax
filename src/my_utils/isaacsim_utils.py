@@ -348,11 +348,11 @@ def get_isaacsim_action_list(plan, pos_dict):
                 "p1": Gf.Vec3d(x1, y1, 0.0),
                 "p2": Gf.Vec3d(x2, y2, 0.0),
             })
-        elif "placeonobject" in action_str:
+        elif "placeonobstacle" in action_str:
             x1, y1 = pos_dict[vars[3].split(':')[0]]
             x2, y2 = pos_dict[vars[4].split(':')[0]]
             isaacsim_action_list.append({
-                "action_name": "placeonobject",
+                "action_name": "placeonobstacle",
                 "o1": vars[1].split(':')[0],
                 "o2": vars[2].split(':')[0],
                 "p1": Gf.Vec3d(x1, y1, 0.0),
@@ -455,8 +455,8 @@ class ForkliftController:
             done = self.pickup(isaacsim_action["o"], isaacsim_action["p1"], isaacsim_action["p2"])
         elif isaacsim_action["action_name"] == "placeonground":
             done = self.place(isaacsim_action["o"], None, isaacsim_action["p1"], isaacsim_action["p2"], mode="placeonground")
-        elif isaacsim_action["action_name"] == "placeonobject":
-            done = self.place(isaacsim_action["o1"], isaacsim_action["o2"], isaacsim_action["p1"], isaacsim_action["p2"], mode="placeonobject")
+        elif isaacsim_action["action_name"] == "placeonobstacle":
+            done = self.place(isaacsim_action["o1"], isaacsim_action["o2"], isaacsim_action["p1"], isaacsim_action["p2"], mode="placeonobstacle")
         if done:
             self.action_idx += 1
         self.last_action_name = isaacsim_action["action_name"]
@@ -662,7 +662,7 @@ class ForkliftController:
                 self.back_wheel_drive_drive_api.GetTargetVelocityAttr().Set(0)
                 if mode == "placeonground":
                     self.lift_joint_drive_api.GetTargetPositionAttr().Set(self.H_PLACEONGROUND)
-                elif mode == "placeonobject":
+                elif mode == "placeonobstacle":
                     self.lift_joint_drive_api.GetTargetPositionAttr().Set(self.H_PLACEONOBJECT)
                 self.end_placing = True
                 self.direction_adjusted = False
