@@ -76,7 +76,7 @@ def grid_to_pddl(w, h, grid, robot_pos, robot_direction, tmp_pddl_path = "tmp_ma
             o = grid[pos_idx]
             if o is not None:
                 if o.type != "goal":
-                    objects.append("o{} - object".format(object_idx))
+                    objects.append("o{} - obstacle".format(object_idx))
                     init_state.append("(oAt o{} p{})".format(object_idx, pos_idx))
                 if o.type == "moveable_heavy_box":
                     init_state.append("(isHeavy o{})".format(object_idx))
@@ -138,10 +138,19 @@ def grid_to_pddl(w, h, grid, robot_pos, robot_direction, tmp_pddl_path = "tmp_ma
 if __name__ == "__main__":
     pddl_domain_file_path = "pddl_files/domains/mazenamo.pddl"
     tmp_pddl_problem_path = "tmp_mazenamo_problem.pddl"
-    MAX_PROBLEM_NUM = 500
+    MAX_PROBLEM_NUM = 200
 
-    problem_size = 15
-    if problem_size == 10:
+    problem_size = 12
+
+    if problem_size == 8:
+        timeout = {
+            "min": 0.1,
+            "easy": 1,
+            "medium": 2,
+            "hard": 5,
+            "expert": 10,
+        }
+    elif problem_size == 10:
         timeout = {
             "min": 0.1,
             "easy": 2,
@@ -177,7 +186,8 @@ if __name__ == "__main__":
     for mode in ["easy", "medium", "hard", "expert"]:
         problem_dir[mode] = {}
         for dir in ["map", "pddl", "solution_sat"]:
-            problem_dir[mode][dir] = f"pddl_files/problems/mazenamo_problems/{dir}_{problem_size}x{problem_size}_{mode}"
+            # problem_dir[mode][dir] = f"pddl_files/problems/mazenamo_problems/{dir}_{problem_size}x{problem_size}_{mode}"
+            problem_dir[mode][dir] = f"mazenamo_problems/{dir}_{problem_size}x{problem_size}_{mode}"
             if not os.path.exists(problem_dir[mode][dir]):
                 os.makedirs(problem_dir[mode][dir])
     
@@ -191,7 +201,8 @@ if __name__ == "__main__":
 
         # print("direction", robot_direction, DIRECTIONS.index(robot_direction))
         vec_env: MazeNamoEnv = gym.make(
-            "MiniGrid-MazeNamoEnv-v0",
+            # "MiniGrid-MazeNamoEnv-v0",
+            "MiniGrid-MazeNamo-v0",
             render_mode="human",
             width=problem_size,
             height=problem_size,

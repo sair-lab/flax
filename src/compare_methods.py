@@ -36,7 +36,7 @@ def compare_one_problem(problem_map_dir, problem_idx, args):
     )
 
     mazenamo_env = vec_env.env.env
-    np.save("namo_grid.npy", grid)
+    np.save("mazenamo_grid.npy", grid)
     mazenamo_env.gen_grid(args.problem_size, args.problem_size)
     mazenamo_env.reset()
 

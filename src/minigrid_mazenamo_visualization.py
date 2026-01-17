@@ -57,7 +57,7 @@ def visualize_one_problem(problem_map_dir, problem_idx, args):
     )
 
     mazenamo_env = vec_env.env.env
-    np.save("namo_grid.npy", grid)
+    np.save("mazenamo_grid.npy", grid)
     mazenamo_env.gen_grid(args.problem_size, args.problem_size)
     mazenamo_env.reset()
     imageio.imwrite(f"{args.vis_log_dir}/namo_{args.problem_size}x{args.problem_size}"
@@ -128,7 +128,7 @@ def visualize_one_problem(problem_map_dir, problem_idx, args):
     print("Get plan of length {} in {:.5f} seconds".format(
         len(plan), time.time()-start), flush=True)
 
-    np.save("namo_grid.npy", grid)
+    np.save("mazenamo_grid.npy", grid)
     mazenamo_env.gen_grid(args.problem_size, args.problem_size)
     mazenamo_env.reset()
 
@@ -145,7 +145,7 @@ def visualize_one_problem(problem_map_dir, problem_idx, args):
 
     if "gnn_ignored_objects" in vis_info and vis_info["gnn_ignored_objects"] is not None:
         _grid = get_gnn_relaxed_grid(grid.copy(), vis_info["gnn_ignored_objects"])
-        np.save("namo_grid.npy", _grid)
+        np.save("mazenamo_grid.npy", _grid)
         _vec_env: MazeNamoEnv = gym.make(
             "MiniGrid-MazeNamo-v0",
             render_mode="rgb_array",
@@ -163,7 +163,7 @@ def visualize_one_problem(problem_map_dir, problem_idx, args):
         if args.draw_scores:
             for threshold, ignored_objects in vis_info["gnn_ignored_objects_threshold_dict"].items():
                 _grid = get_gnn_relaxed_grid(grid.copy(), ignored_objects)
-                np.save("namo_grid.npy", _grid)
+                np.save("mazenamo_grid.npy", _grid)
                 _vec_env: MazeNamoEnv = gym.make(
                     "MiniGrid-MazeNamo-v0",
                     render_mode="rgb_array",
@@ -180,7 +180,7 @@ def visualize_one_problem(problem_map_dir, problem_idx, args):
 
     if "cmpl_ignored_objects" in vis_info and vis_info["cmpl_ignored_objects"] is not None:
         _grid = get_gnn_relaxed_grid(grid.copy(), vis_info["cmpl_ignored_objects"])
-        np.save("namo_grid.npy", _grid)
+        np.save("mazenamo_grid.npy", _grid)
         _vec_env: MazeNamoEnv = gym.make(
             "MiniGrid-MazeNamo-v0",
             # render_mode="human",
@@ -198,7 +198,7 @@ def visualize_one_problem(problem_map_dir, problem_idx, args):
 
     if "relx_ignored_objects" in vis_info and vis_info["relx_ignored_objects"] is not None:
         _grid = get_rule_relaxed_grid(grid.copy(), vis_info["relx_ignored_objects"])
-        np.save("namo_grid.npy", _grid)
+        np.save("mazenamo_grid.npy", _grid)
         _vec_env: MazeNamoEnv = gym.make(
             "MiniGrid-MazeNamo-v0",
             # render_mode="human",

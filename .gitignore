@@ -38,3 +38,5 @@ sas_plan
 vis/
 assets/
 logs/
+mazenamo_problems/
+tmp_*_problem.pddl

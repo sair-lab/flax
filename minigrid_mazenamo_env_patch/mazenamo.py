@@ -123,7 +123,7 @@ class MazeNamoEnv(MiniGridEnv):
         ROBOT = 4
         GOAL = 5
 
-        grid_array = np.load("namo_grid.npy")
+        grid_array = np.load("mazenamo_grid.npy")
 
         # Create an empty grid
         self.grid = Grid(width, height)
