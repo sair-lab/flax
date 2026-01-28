@@ -84,12 +84,15 @@ def apply_relaxation_rules(state, relaxation_rules, domain, force_include_goal_o
                         for v_idx in v_idx_list:
                             if v_idx not in v_idx_2_obj:
                                 v0 = v_idx_2_obj[0]
-                                try: 
+                                try:
                                     v_idx_2_obj[v_idx] = pre_compute_relation[del_p_name][v0]
                                 except:
                                     continue
                         try:
-                            relaxed_literals.discard(Literal(del_p, [v_idx_2_obj[v_idx] for v_idx in v_idx_list]))
+                            candidate_vars = [v_idx_2_obj[v_idx] for v_idx in v_idx_list]
+                            # Do not delete literals that involve goal objects
+                            if not any(v in goal_objects for v in candidate_vars):
+                                relaxed_literals.discard(Literal(del_p, candidate_vars))
                         except:
                             continue
                 for add_p_name in rule["add_effects"]:
