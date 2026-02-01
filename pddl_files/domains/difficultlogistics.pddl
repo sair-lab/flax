@@ -24,10 +24,10 @@
     (on ?obj ?below)          ; obj is directly on top of ?below
     (clear ?obj)              ; nothing on top of obj
 
-    ;; Emptiness for ground unloading:
-    ;;  - true initially only at locations with no packages
-    ;;  - once a package is ground-unloaded there, it becomes false forever
-    (loc-empty ?loc)
+    ;; Ground Availability
+    ;; True if NO package is currently on the ground at this location.
+    ;; This allows a location to be reused after it is cleared.
+    (ground-free ?loc)
 
     ;; Capacity: single slot per vehicle
     (slot-free ?veh)          ; vehicle currently carries no package
@@ -42,7 +42,7 @@
   ;; LOADING INTO TRUCKS (single slot)
   ;; ============================================================
 
-  ;; Load a clear package from the ground (bottom of stack)
+  ;; Load a clear package from the ground.
   (:action LOAD-TRUCK-FROM-GROUND
     :parameters (?obj ?truck ?loc)
     :precondition
@@ -56,10 +56,11 @@
       (and (not (at ?obj ?loc))
            (not (on-ground ?obj))
            (in ?obj ?truck)
-           (not (slot-free ?truck)))
+           (not (slot-free ?truck))
+           (ground-free ?loc))
   )
 
-  ;; Load a clear package from the top of a stack
+  ;; Load a clear package from the top of a stack.
   (:action LOAD-TRUCK-FROM-STACK
     :parameters (?obj ?below ?truck ?loc)
     :precondition
@@ -83,26 +84,24 @@
   ;; UNLOADING FROM TRUCKS
   ;; ============================================================
 
-  ;; To ground: ONLY when location is marked loc-empty (no package has ever been ground-unloaded there).
-  ;; Once you place the first package, loc-empty becomes false forever.
+  ;; To ground: ONLY when the ground is free (no bottom stack exists).
   (:action UNLOAD-TRUCK-TO-GROUND
     :parameters (?obj ?truck ?loc)
     :precondition
       (and (OBJ ?obj) (TRUCK ?truck) (LOCATION ?loc)
            (at ?truck ?loc)
            (in ?obj ?truck)
-           (loc-empty ?loc))
+           (ground-free ?loc))
     :effect
       (and (not (in ?obj ?truck))
            (slot-free ?truck)
            (at ?obj ?loc)
            (on-ground ?obj)
            (clear ?obj)
-           (not (loc-empty ?loc)))
+           (not (ground-free ?loc)))
   )
 
-  ;; Onto another package: allowed only if there is a clear package at loc.
-  ;; This is how we build multi-package stacks at non-empty locations.
+  ;; Onto another package.
   (:action UNLOAD-TRUCK-ONTO
     :parameters (?obj ?below ?truck ?loc)
     :precondition
@@ -138,7 +137,8 @@
       (and (not (at ?obj ?loc))
            (not (on-ground ?obj))
            (in ?obj ?airplane)
-           (not (slot-free ?airplane)))
+           (not (slot-free ?airplane))
+           (ground-free ?loc))
   )
 
   (:action LOAD-AIRPLANE-FROM-STACK
@@ -164,24 +164,22 @@
   ;; UNLOADING FROM AIRPLANES
   ;; ============================================================
 
-  ;; To ground: ONLY when location is loc-empty.
   (:action UNLOAD-AIRPLANE-TO-GROUND
     :parameters (?obj ?airplane ?loc)
     :precondition
       (and (OBJ ?obj) (AIRPLANE ?airplane) (LOCATION ?loc)
            (at ?airplane ?loc)
            (in ?obj ?airplane)
-           (loc-empty ?loc))
+           (ground-free ?loc))
     :effect
       (and (not (in ?obj ?airplane))
            (slot-free ?airplane)
            (at ?obj ?loc)
            (on-ground ?obj)
            (clear ?obj)
-           (not (loc-empty ?loc)))
+           (not (ground-free ?loc)))
   )
 
-  ;; Onto a package
   (:action UNLOAD-AIRPLANE-ONTO
     :parameters (?obj ?below ?airplane ?loc)
     :precondition
