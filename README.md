@@ -19,7 +19,9 @@
     <a href = "https://arxiv.org/abs/2507.15975">&#128196; [Arxiv]</a>
 </strong></p>
 
-### Accepted to IEEE Robotics and Automation Letters (RA-L), 2026
+<p align="center"><strong> 
+    Accepted to IEEE Robotics and Automation Letters (RA-L), 2026
+</strong></p>
 
 <img src="figs/pipeline.png" width="100%"/>
 
