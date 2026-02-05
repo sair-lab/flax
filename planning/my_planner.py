@@ -69,7 +69,7 @@ def apply_relaxation_rules(state, relaxation_rules, domain, force_include_goal_o
             if p_name in rule["precond"]:
                 v_idx_2_obj = {}
                 for v_idx in rule["precond"][p_name]:
-                    v_idx_2_obj[v_idx] = lit.variables[0]
+                    v_idx_2_obj[v_idx] = lit.variables[v_idx]
                 for v_idx in rule["delete_objects"]:
                     if v_idx_2_obj[v_idx] not in goal_objects:
                         relaxed_objects.discard(v_idx_2_obj[v_idx])
